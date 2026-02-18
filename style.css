@@ -1,7 +1,8 @@
 /* ============================================
-   DARK THEME VARIABLES
+   DARK THEME VARIABLES (padrão)
    ============================================ */
-:root {
+:root,
+[data-theme="dark"] {
     --dark-base: #07090d;
     --dark-elevated: #0f1419;
     --dark-card: #1a1f24;
@@ -14,12 +15,76 @@
     --accent-primary-hover: #28d15e; /* Fallback padrão - será sobrescrito dinamicamente */
 }
 
+/* ============================================
+   LIGHT THEME VARIABLES
+   ============================================ */
+[data-theme="light"] {
+    --dark-base: #f3f4f6;
+    --dark-elevated: #e5e7eb;
+    --dark-card: #ffffff;
+    --dark-border: rgba(0, 0, 0, 0.1);
+    --text-primary: rgba(0, 0, 0, 0.9);
+    --text-secondary: rgba(0, 0, 0, 0.7);
+    --text-muted: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .bg-dark-base\/80 {
+    background-color: rgba(243, 244, 246, 0.9);
+}
+
+/* Header fixo em tema claro */
+[data-theme="light"] header.fixed {
+    background: rgba(243, 244, 246, 0.9);
+}
+
+/* Ajuste de texto no tema claro (Tailwind) */
+[data-theme="light"] .text-white {
+    color: var(--text-primary);
+}
+[data-theme="light"] .text-gray-400,
+[data-theme="light"] .text-gray-500 {
+    color: var(--text-secondary);
+}
+[data-theme="light"] .text-gray-300 {
+    color: var(--text-secondary);
+}
+[data-theme="light"] .placeholder-gray-500::placeholder {
+    color: var(--text-muted);
+}
+[data-theme="light"] .hover\:text-white:hover {
+    color: var(--text-primary);
+}
+[data-theme="light"] .hover\:bg-dark-elevated:hover {
+    background-color: var(--dark-elevated);
+}
+[data-theme="light"] .hover\:bg-dark-card:hover {
+    background-color: var(--dark-card);
+}
+[data-theme="light"] .border-dark-border {
+    border-color: var(--dark-border);
+}
+[data-theme="light"] .divide-dark-border > * + * {
+    border-color: var(--dark-border);
+}
+
+/* Botão de toggle tema */
+.theme-toggle-btn {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background 0.2s, color 0.2s;
+}
+.theme-toggle-btn:hover {
+    background-color: var(--dark-elevated);
+    color: var(--text-primary);
+}
+
 /* Estilos para complementar o TailwindCSS e customizar o Payment Brick do Mercado Pago.
 */
 body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--dark-base);
 }
 
 /* Dark Theme Background Classes */

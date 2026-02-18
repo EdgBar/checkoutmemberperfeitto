@@ -58,6 +58,27 @@ $csrf_token_js = generate_csrf_token();
     </div>
 </div>
 
+<!-- Seção: Tema (modo claro/escuro) -->
+<div class="bg-dark-card p-8 rounded-lg shadow-md mb-6 border border-dark-border">
+    <h2 class="text-2xl font-semibold mb-6 text-white flex items-center gap-2">
+        <i data-lucide="sun" class="w-6 h-6" style="color: var(--accent-primary);"></i>
+        <span>Tema (modo claro/escuro)</span>
+    </h2>
+    <p class="text-gray-400 mb-6">Defina o tema padrão do sistema. Os usuários podem alternar a qualquer momento pelo botão no canto superior direito.</p>
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+        <div class="flex-1">
+            <label for="tema_padrao" class="block text-gray-300 text-sm font-semibold mb-2">Tema padrão</label>
+            <select id="tema_padrao" name="tema_padrao" class="w-full md:w-48 px-4 py-3 bg-dark-elevated border border-dark-border rounded-lg text-white focus:outline-none focus:ring-2 transition duration-300" style="--tw-ring-color: var(--accent-primary);">
+                <option value="dark">Escuro</option>
+                <option value="light">Claro</option>
+            </select>
+        </div>
+        <button type="button" id="save-tema-padrao-btn" class="text-white font-bold py-2 px-4 rounded-lg transition duration-300" style="background-color: var(--accent-primary);" onmouseover="this.style.backgroundColor='var(--accent-primary-hover)'" onmouseout="this.style.backgroundColor='var(--accent-primary)'">
+            Salvar Tema
+        </button>
+    </div>
+</div>
+
 <!-- Seção: Logo -->
 <div class="bg-dark-card p-8 rounded-lg shadow-md mb-6 border border-dark-border">
     <h2 class="text-2xl font-semibold mb-6 text-white flex items-center gap-2">
@@ -342,6 +363,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const allowVideoUploadCheck = document.getElementById('allow_video_upload');
                 if (allowVideoUploadCheck) {
                     allowVideoUploadCheck.checked = (result.data.allow_video_upload === '1' || result.data.allow_video_upload === true);
+                }
+                
+                // Tema padrão (claro/escuro)
+                const temaPadraoSelect = document.getElementById('tema_padrao');
+                if (temaPadraoSelect && result.data.tema_padrao) {
+                    temaPadraoSelect.value = result.data.tema_padrao === 'light' ? 'light' : 'dark';
                 }
             }
         } catch (error) {
@@ -757,6 +784,37 @@ document.addEventListener('DOMContentLoaded', function() {
             saveLoginBgUrlBtn.textContent = 'Salvar URL';
         }
     });
+    
+    // Salvar tema padrão (claro/escuro)
+    const saveTemaPadraoBtn = document.getElementById('save-tema-padrao-btn');
+    if (saveTemaPadraoBtn) {
+        saveTemaPadraoBtn.addEventListener('click', async function() {
+            const temaSelect = document.getElementById('tema_padrao');
+            if (!temaSelect) return;
+            const tema = temaSelect.value === 'light' ? 'light' : 'dark';
+            saveTemaPadraoBtn.disabled = true;
+            saveTemaPadraoBtn.textContent = 'Salvando...';
+            try {
+                const response = await fetch('/api/admin_api.php?action=save_system_settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
+                    body: JSON.stringify({ tema_padrao: tema, csrf_token: window.csrfToken || '' })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showMessage('Tema padrão salvo. Novas abas usarão este tema; o botão no header continua alternando na sessão atual.', 'success');
+                } else {
+                    showMessage(result.error || 'Erro ao salvar tema', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('Erro de comunicação com o servidor', 'error');
+            } finally {
+                saveTemaPadraoBtn.disabled = false;
+                saveTemaPadraoBtn.textContent = 'Salvar Tema';
+            }
+        });
+    }
     
     // Carregar configurações ao iniciar
     loadSettings();

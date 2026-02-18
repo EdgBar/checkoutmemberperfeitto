@@ -197,6 +197,12 @@ $page_content = ob_get_clean();
     // para garantir que as meta tags PWA estejam no início do head
     include __DIR__ . '/config/load_settings.php'; 
     ?>
+    <script>
+    (function(){
+      var t = localStorage.getItem('theme') || '<?php echo htmlspecialchars(getSystemSetting('tema_padrao', 'dark'), ENT_QUOTES, 'UTF-8'); ?>';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     
     <?php if ($pwa_module_installed): ?>
     <!-- Script CRÍTICO para verificação e forçar modo standalone no iOS -->
@@ -514,7 +520,7 @@ $page_content = ob_get_clean();
 
     </style>
 </head>
-<body class="font-sans flex flex-col min-h-screen" style="background-color: #07090d;">
+<body class="font-sans flex flex-col min-h-screen" style="background-color: var(--dark-base);">
     <!-- Header Fixo Invisível (Topo) -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-dark-base/80 backdrop-blur-sm h-[60px] flex items-center justify-between px-4 md:px-6">
         <!-- Botão de Toggle Mobile -->
@@ -523,8 +529,13 @@ $page_content = ob_get_clean();
         </button>
         <div class="hidden md:block"></div> <!-- Espaçador para desktop -->
         
-        <!-- Controles do Header (Notificação, Perfil, Logout) -->
+        <!-- Controles do Header (Tema, Notificação, Perfil, Logout) -->
         <div class="flex items-center space-x-3">
+            <!-- Botão Dark/Light Mode -->
+            <button type="button" id="theme-toggle" class="theme-toggle-btn p-2 rounded-lg border border-dark-border transition-colors" style="color: var(--text-primary);" title="Alternar modo claro/escuro" aria-label="Alternar tema">
+                <i data-lucide="moon" class="w-5 h-5 theme-icon-dark"></i>
+                <i data-lucide="sun" class="w-5 h-5 theme-icon-light hidden"></i>
+            </button>
             <!-- Sininho de Notificações -->
             <div id="notification-bell" class="notification-bell-container flex items-center justify-center relative cursor-pointer p-2 rounded-lg hover:bg-dark-elevated transition-colors">
                 <i data-lucide="bell" id="bell-icon" class="w-6 h-6 text-gray-400 hover:text-white transition-colors"></i>
@@ -858,6 +869,38 @@ $page_content = ob_get_clean();
                 lucide.createIcons();
             }
         }, 500);
+
+        // --- Toggle Dark/Light Mode ---
+        (function() {
+            var themeToggle = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function applyTheme(theme) {
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                var iconDark = document.querySelector('#theme-toggle .theme-icon-dark');
+                var iconLight = document.querySelector('#theme-toggle .theme-icon-light');
+                if (iconDark && iconLight) {
+                    iconDark.classList.toggle('hidden', theme === 'light');
+                    iconLight.classList.toggle('hidden', theme !== 'light');
+                }
+            }
+            function themeToggleClick() {
+                var current = root.getAttribute('data-theme') || 'dark';
+                var next = current === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+            if (themeToggle) {
+                themeToggle.addEventListener('click', themeToggleClick);
+                var current = root.getAttribute('data-theme') || 'dark';
+                var iconDark = document.querySelector('#theme-toggle .theme-icon-dark');
+                var iconLight = document.querySelector('#theme-toggle .theme-icon-light');
+                if (iconDark && iconLight) {
+                    iconDark.classList.toggle('hidden', current === 'light');
+                    iconLight.classList.toggle('hidden', current !== 'light');
+                }
+            }
+        })();
 
         // --- Lógica de Responsividade do Menu Lateral ---
         const sidebarToggle = document.getElementById('sidebar-toggle');

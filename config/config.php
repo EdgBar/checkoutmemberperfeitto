@@ -7,14 +7,15 @@
 error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
 // ---- Bloqueio por licença: o sistema só funciona com licença válida ----
-require_once __DIR__ . '/../licenca_config.php';
-require_once __DIR__ . '/../helpers/licenca_helper.php';
-validarLicencaCheckoutPRO();
+// Para reativar: descomente as 3 linhas abaixo.
+// require_once __DIR__ . '/../licenca_config.php';
+// require_once __DIR__ . '/../helpers/licenca_helper.php';
+// validarLicencaCheckoutPRO();
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'u733823283_v3'); // Insira seu usuário do banco de dados
-define('DB_PASS', '#GeladeiraAberta123');   // Insira sua senha
-define('DB_NAME', 'u733823283_v3'); // Insira o nome do banco de dados
+define('DB_USER', 'u698447590_bdcheckout');
+define('DB_PASS', 'U698447590_bdcheckout');
+define('DB_NAME', 'u698447590_bdcheckout');
 
 // Define o fuso horário padrão para o PHP para 'America/Sao_Paulo' (Horário de Brasília)
 date_default_timezone_set('America/Sao_Paulo');

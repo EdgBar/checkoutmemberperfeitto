@@ -1309,7 +1309,8 @@ try {
             'logo_checkout_url' => $logo_checkout_url_normalized,
             'favicon_url' => $favicon_url_normalized,
             'login_bg_url' => getSystemSetting('login_bg_url', ''),
-            'allow_video_upload' => getSystemSetting('allow_video_upload', '0')
+            'allow_video_upload' => getSystemSetting('allow_video_upload', '0'),
+            'tema_padrao' => getSystemSetting('tema_padrao', 'dark')
         ];
         
         ob_clean();
@@ -1350,7 +1351,7 @@ try {
         // Debug: log dos dados recebidos
         error_log("ADMIN_API save_system_settings: Dados recebidos: " . json_encode($data));
         
-        if (!isset($data['cor_primaria']) && !isset($data['logo_url']) && !isset($data['login_image_url']) && !isset($data['nome_plataforma']) && !isset($data['logo_checkout_url']) && !isset($data['login_bg_url']) && !isset($data['allow_video_upload'])) {
+        if (!isset($data['cor_primaria']) && !isset($data['logo_url']) && !isset($data['login_image_url']) && !isset($data['nome_plataforma']) && !isset($data['logo_checkout_url']) && !isset($data['login_bg_url']) && !isset($data['allow_video_upload']) && !isset($data['tema_padrao'])) {
             ob_clean();
             echo json_encode(['success' => false, 'error' => 'Nenhuma configuração fornecida']);
             exit;
@@ -1431,6 +1432,13 @@ try {
             $val = ($val === true || $val === '1' || $val === 1) ? '1' : '0';
             if (setSystemSetting('allow_video_upload', $val)) {
                 $updated[] = 'allow_video_upload';
+            }
+        }
+        if (isset($data['tema_padrao'])) {
+            $tema = strtolower(trim((string) $data['tema_padrao']));
+            $tema = ($tema === 'light') ? 'light' : 'dark';
+            if (setSystemSetting('tema_padrao', $tema)) {
+                $updated[] = 'tema_padrao';
             }
         }
         

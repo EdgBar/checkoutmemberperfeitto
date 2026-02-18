@@ -27,6 +27,12 @@ $inactive_class = 'sidebar-item sidebar-item-inactive';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Administrador</title>
     <?php include __DIR__ . '/config/load_settings.php'; ?>
+    <script>
+    (function(){
+      var t = localStorage.getItem('theme') || '<?php echo htmlspecialchars(getSystemSetting('tema_padrao', 'dark'), ENT_QUOTES, 'UTF-8'); ?>';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -94,7 +100,7 @@ $inactive_class = 'sidebar-item sidebar-item-inactive';
 
     </style>
 </head>
-<body class="font-sans flex flex-col min-h-screen" style="background-color: #07090d;">
+<body class="font-sans flex flex-col min-h-screen" style="background-color: var(--dark-base);">
     <!-- Header Fixo Invisível (Topo) -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-dark-base/80 backdrop-blur-sm h-[60px] flex items-center justify-between px-4 md:px-6">
         <!-- Botão de Toggle Mobile -->
@@ -103,9 +109,12 @@ $inactive_class = 'sidebar-item sidebar-item-inactive';
         </button>
         <div class="hidden md:block"></div> <!-- Espaçador para desktop -->
         
-        <!-- Controles do Header (Revenda Autorizada e Logout) -->
+        <!-- Controles do Header (Tema, Logout) -->
         <div class="flex items-center space-x-3">
-
+            <button type="button" id="theme-toggle" class="theme-toggle-btn p-2 rounded-lg border border-dark-border transition-colors" style="color: var(--text-primary);" title="Alternar modo claro/escuro" aria-label="Alternar tema">
+                <i data-lucide="moon" class="w-5 h-5 theme-icon-dark"></i>
+                <i data-lucide="sun" class="w-5 h-5 theme-icon-light hidden"></i>
+            </button>
             <a href="/logout" class="text-gray-400 hover:text-red-500 transition-colors duration-200 p-2 rounded-lg hover:bg-dark-elevated" title="Sair">
                 <i data-lucide="log-out" class="w-5 h-5"></i>
             </a>
@@ -278,6 +287,36 @@ $inactive_class = 'sidebar-item sidebar-item-inactive';
 
         adminSidebarToggle.addEventListener('click', toggleAdminSidebar);
         adminSidebarOverlay.addEventListener('click', toggleAdminSidebar);
+
+        // --- Toggle Dark/Light Mode ---
+        (function() {
+            var themeToggle = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function applyTheme(theme) {
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                var iconDark = document.querySelector('#theme-toggle .theme-icon-dark');
+                var iconLight = document.querySelector('#theme-toggle .theme-icon-light');
+                if (iconDark && iconLight) {
+                    iconDark.classList.toggle('hidden', theme === 'light');
+                    iconLight.classList.toggle('hidden', theme !== 'light');
+                }
+            }
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    var current = root.getAttribute('data-theme') || 'dark';
+                    applyTheme(current === 'dark' ? 'light' : 'dark');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+                var current = root.getAttribute('data-theme') || 'dark';
+                var iconDark = document.querySelector('#theme-toggle .theme-icon-dark');
+                var iconLight = document.querySelector('#theme-toggle .theme-icon-light');
+                if (iconDark && iconLight) {
+                    iconDark.classList.toggle('hidden', current === 'light');
+                    iconLight.classList.toggle('hidden', current !== 'light');
+                }
+            }
+        })();
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) { // Desktop breakpoint
